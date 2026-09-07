@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Order | Bean Rooted Cafe</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo">📦</div>
+      <div>
+        <h1>Order Tracking</h1>
+        <p>Follow your order from preparation to delivery.</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="link-btn" href="index.html">Back to menu</a>
+    </div>
+  </header>
+
+  <main class="tracking-shell">
+    <section class="tracking-hero">
+      <div class="tracking-copy">
+        <p class="section-label">Customer tracking</p>
+        <h2>Track your order in real time</h2>
+        <p>Enter your tracking number and instantly see where your order is, what stage it is in, and the latest delivery update.</p>
+        <form class="tracking-search-card" id="tracking-search-form">
+          <label class="sr-only" for="tracking-input">Tracking number</label>
+          <input type="text" id="tracking-input" placeholder="Enter your tracking number" />
+          <button class="primary-btn" id="track-submit-btn" type="submit">Track order</button>
+        </form>
+        <p class="form-feedback" id="tracking-feedback">Enter your tracking number to get started.</p>
+      </div>
+      <div class="tracking-preview-card">
+        <div class="tracking-preview-badge">Live delivery progress</div>
+        <h3>Your order journey</h3>
+        <p>From confirmation to delivery, we keep your order visible every step of the way.</p>
+        <div class="tracking-preview-steps">
+          <span class="badge-pill active">Pending</span>
+          <span class="badge-pill active">Preparing</span>
+          <span class="badge-pill">On Delivery</span>
+          <span class="badge-pill">Delivered</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="tracking-result-panel">
+      <div id="tracking-result" class="tracking-result hidden"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    const trackingInput = document.getElementById('tracking-input');
+    const trackingFeedback = document.getElementById('tracking-feedback');
+    const trackSubmitBtn = document.getElementById('track-submit-btn');
+    const trackingResult = document.getElementById('tracking-result');
+    const trackingSearchForm = document.getElementById('tracking-search-form');
+    let currentTrackingOrder = null;
+
+    function openImageModal(title, imageSrc) {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `
+        <div class="modal-card image-modal-card">
+          <div class="modal-header">
+            <h2>${title}</h2>
+            <button class="close-btn" type="button">×</button>
+          </div>
+          <div class="image-modal-body">
+            <img src="${imageSrc}" alt="${title}" class="image-modal-preview" />
+          </div>
+        </div>
+      `;
+      overlay.querySelector('.close-btn').addEventListener('click', () => overlay.remove());
+      overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) overlay.remove();
+      });
+      document.body.appendChild(overlay);
+    }
+
+    function renderTrackingResult(order) {
+      if (!order) {
+        trackingResult.classList.remove('hidden');
+        trackingResult.innerHTML = `
+          <article class="tracking-empty-state">
+            <h3>No order found</h3>
+            <p>We could not find a matching order for that tracking number. Please double-check the code and try again.</p>
+          </article>
+        `;
+        trackingFeedback.textContent = 'No order found for that tracking number.';
+        return;
+      }
+
+      const statusSteps = ['Pending', 'Preparing', 'On Delivery', 'Delivered'];
+      const currentIndex = statusSteps.indexOf(order.status);
+      const progress = Math.max(0, Math.min(statusSteps.length - 1, currentIndex));
+      const paymentMethodLabel = order.paymentMethod === 'wallet' ? 'e-Wallet' : 'Cash on delivery';
+      const currentStatus = order.status || 'Pending';
+      const eta = order.eta || 'Soon';
+      currentTrackingOrder = order;
+
+      trackingResult.classList.remove('hidden');
+      trackingResult.innerHTML = `
+        <article class="tracking-order-card">
+          <div class="tracking-order-top">
+            <div>
+              <div class="tracking-preview-badge">Order found</div>
+              <h3>${order.id}</h3>
+              <p class="order-meta">Tracking number: ${order.trackingCode || '—'}</p>
+            </div>
+            <span class="badge-pill active">${currentStatus}</span>
+          </div>
+
+          <div class="tracking-stats-grid">
+            <div class="tracking-stat-box">
+              <span>Customer</span>
+              <strong>${order.customer || 'Unknown'}</strong>
+            </div>
+            <div class="tracking-stat-box">
+              <span>Payment</span>
+              <strong>${paymentMethodLabel}</strong>
+            </div>
+            <div class="tracking-stat-box">
+              <span>Estimated time</span>
+              <strong>${eta}</strong>
+            </div>
+          </div>
+
+          <div class="tracking-progress-grid">
+            ${statusSteps.map((step, index) => `
+              <div class="tracking-step-card ${index <= progress ? 'active' : ''}">
+                <strong>${step}</strong>
+                <span>${index < progress ? 'Completed' : index === progress ? 'Current step' : 'Upcoming'}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="tracking-detail-grid">
+            <div class="tracking-detail-card">
+              <h4>Payment status</h4>
+              <p>${order.paymentStatus || 'Pending'}</p>
+            </div>
+            <div class="tracking-detail-card">
+              <h4>Delivery number</h4>
+              <p>${order.deliveryNumber || 'Not assigned'}</p>
+            </div>
+            <div class="tracking-detail-card">
+              <h4>Address</h4>
+              <p>${order.address || 'Not provided'}</p>
+            </div>
+          </div>
+
+          ${order.proofImage || order.deliveryProofImage ? `
+            <div class="tracking-proof-card">
+              <div class="tracking-proof-copy">
+                <h4>Delivery proof</h4>
+                <p>The rider uploaded a photo to confirm your delivery.</p>
+              </div>
+              <div class="tracking-proof-actions">
+                <img src="${order.proofImage || order.deliveryProofImage}" alt="Proof of delivery" class="tracking-proof-thumb" />
+                <button class="action-btn secondary" type="button" data-action="view-proof">View full photo</button>
+              </div>
+            </div>
+          ` : ''}
+
+          ${order.status === 'Rejected' ? `<div class="tracking-warning">Rejected: ${order.rejectionReason || 'The receipt was not accepted.'}</div>` : ''}
+        </article>
+      `;
+      trackingFeedback.textContent = 'Tracking details loaded.';
+      if (order.status === 'Rejected') {
+        window.alert(`Your order was rejected. Reason: ${order.rejectionReason || 'The receipt was not accepted.'}`);
+      }
+    }
+
+    async function loadTrackingOrder() {
+      const params = new URLSearchParams(window.location.search);
+      const trackingCode = (params.get('tracking') || trackingInput.value || '').trim();
+      if (!trackingCode) {
+        currentTrackingOrder = null;
+        trackingFeedback.textContent = 'Enter a tracking number to view your order.';
+        trackingResult.classList.remove('hidden');
+        trackingResult.innerHTML = `
+          <article class="tracking-empty-state">
+            <h3>Enter a tracking number</h3>
+            <p>Type in the tracking code from your confirmation message to see your live order progress.</p>
+          </article>
+        `;
+        return;
+      }
+
+      try {
+        const response = await fetch('controllers/create_order.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'get_order', tracking_code: trackingCode })
+        });
+        const data = await response.json();
+        if (data?.success && data.order) {
+          const order = data.order;
+          localStorage.setItem('beanRootedOrders', JSON.stringify([order]));
+          renderTrackingResult(order);
+          return;
+        }
+      } catch (error) {
+        // Fall back to the local cache if the database lookup is unavailable.
+      }
+
+      const orders = JSON.parse(localStorage.getItem('beanRootedOrders')) || [];
+      const order = orders.find(item => item.trackingCode === trackingCode || item.id === trackingCode || item.dbId === trackingCode);
+      renderTrackingResult(order);
+    }
+
+    trackingResult.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action="view-proof"]');
+      if (!button || !(currentTrackingOrder?.proofImage || currentTrackingOrder?.deliveryProofImage)) return;
+      openImageModal('Proof of delivery', currentTrackingOrder.proofImage || currentTrackingOrder.deliveryProofImage);
+    });
+
+    trackingSearchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      loadTrackingOrder();
+    });
+    trackSubmitBtn.addEventListener('click', loadTrackingOrder);
+    trackingInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        loadTrackingOrder();
+      }
+    });
+
+    window.addEventListener('storage', loadTrackingOrder);
+    window.addEventListener('orders-updated', loadTrackingOrder);
+
+    window.addEventListener('load', () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tracking')) {
+        trackingInput.value = params.get('tracking');
+      }
+      loadTrackingOrder();
+    });
+  </script>
+</body>
+</html>

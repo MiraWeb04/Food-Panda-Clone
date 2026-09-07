@@ -1,0 +1,112 @@
+{
+    "input": [],
+    "customerName": "",
+    "phone": "",
+    "address": "",
+    "items": []
+}
+{
+    "input": [],
+    "customerName": "",
+    "phone": "",
+    "address": "",
+    "items": []
+}
+{
+    "input": {
+        "action": "create_order",
+        "customer": "Test User",
+        "email": "test@example.com",
+        "phone": "09170000099",
+        "address": "Test Address",
+        "landmark": "Near test",
+        "paymentMethod": "cash",
+        "total": 250,
+        "items": [
+            {
+                "name": "Americano",
+                "quantity": 1,
+                "price": 100
+            }
+        ]
+    },
+    "customerName": "Test User",
+    "phone": "09170000099",
+    "address": "Test Address",
+    "items": [
+        {
+            "name": "Americano",
+            "quantity": 1,
+            "price": 100
+        }
+    ]
+}
+{
+    "input": {
+        "{_action_:_create_order_,_customer_:_Flow_Tester_,_email_:_flow@example_com_,_phone_:_09170000111_,_address_:_Verification_Address_,_landmark_:_Near_Test_,_paymentMethod_:_cash_,_total_:320,_items_:": {
+            "{ name : Americano , quantity :1, price :100}": ""
+        }
+    },
+    "customerName": "",
+    "phone": "",
+    "address": "",
+    "items": []
+}
+{
+    "input": {
+        "action": "create_order",
+        "customer": "Flow Tester",
+        "email": "flow@example.com",
+        "phone": "09170000111",
+        "address": "Verification Address",
+        "landmark": "Near Test",
+        "paymentMethod": "cash",
+        "total": 320,
+        "items": [
+            {
+                "name": "Americano",
+                "quantity": 1,
+                "price": 100
+            }
+        ]
+    },
+    "customerName": "Flow Tester",
+    "phone": "09170000111",
+    "address": "Verification Address",
+    "items": [
+        {
+            "name": "Americano",
+            "quantity": 1,
+            "price": 100
+        }
+    ]
+}
+{
+    "input": {
+        "action": "create_order",
+        "customer": "Miraflor Bolhano",
+        "email": "bolhanomiraflor@gmail.com",
+        "phone": "09164351527",
+        "address": "San Carlos, Tukuran, Zamboanga del Sur",
+        "landmark": "dcad",
+        "paymentMethod": "cash",
+        "total": 100,
+        "items": [
+            {
+                "name": "Americano",
+                "quantity": 1,
+                "price": 100
+            }
+        ]
+    },
+    "customerName": "Miraflor Bolhano",
+    "phone": "09164351527",
+    "address": "San Carlos, Tukuran, Zamboanga del Sur",
+    "items": [
+        {
+            "name": "Americano",
+            "quantity": 1,
+            "price": 100
+        }
+    ]
+}

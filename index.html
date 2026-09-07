@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bean Rooted Cafe</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo">
+        <img src="images/bean_rooted_logo.png" alt="Bean Rooted Cafe logo" class="site-logo" />
+      </div>
+      <div>
+        <h1>Bean Rooted Cafe</h1>
+        <p>Fresh coffee, cozy vibes, and handcrafted treats</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="link-btn" href="login.php">Staff / Admin</a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light and dark theme" title="Toggle theme">
+        <span id="theme-icon">🌙</span>
+      </button>
+      <button class="cart-button" id="open-cart-btn">
+        Cart <span id="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="customer-view">
+  <main>
+    <section class="hero">
+      <div>
+        <h1>You've bean here for a reason</h1>
+        <p>Step into Bean Rooted Cafe for rich coffee, warm pastries, and a calm place to pause and recharge.</p>
+        <div class="order-actions" style="margin-top: 1rem;">
+          <button class="primary-btn" id="view-menu-btn">Browse the menu</button>
+          <a class="primary-btn secondary" href="tracking.html">Track your order</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-card">Order online. Pay securely.</div>
+      </div>
+    </section>
+
+    <section class="category-bar" id="category-bar">
+      <button class="category active" data-category="all">All</button>
+      <button class="category" data-category="pastries">Pastries</button>
+      <button class="category" data-category="espresso">Espresso Classics</button>
+      <button class="category" data-category="iced-espresso">Iced Espresso</button>
+      <button class="category" data-category="matcha-hojicha">Matcha &amp; Hojicha Tea</button>
+      <button class="category" data-category="frappes">Blended (Frappes)</button>
+      <button class="category" data-category="refreshers">Sparkling Refreshers</button>
+      <button class="category" data-category="snacks">Snacks</button>
+      <button class="category" data-category="rice-meals">Rice Meals</button>
+    </section>
+
+    <section class="products-section">
+      <div class="section-header">
+        <h2>Menu</h2>
+        <p>Select your favorites and add them to the cart.</p>
+      </div>
+      <div class="products-grid" id="products"></div>
+    </section>
+
+    <section class="advantages">
+      <article>
+        <h3>Fast delivery</h3>
+        <p>Get your order delivered hot and fresh in minutes.</p>
+      </article>
+      <article>
+        <h3>Secure checkout</h3>
+        <p>Pay directly on the website using a trusted form.</p>
+      </article>
+      <article>
+        <h3>Easy ordering</h3>
+        <p>Browse products by category and review your cart anytime.</p>
+      </article>
+    </section>
+  </main>
+  </div>
+
+  <aside class="cart-panel hidden" id="cart-panel">
+    <div class="cart-header">
+      <h2>Your cart</h2>
+      <button class="close-btn" id="close-cart-btn">×</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-summary">
+      <div>
+        <span>Total</span>
+        <strong id="cart-total">$0.00</strong>
+      </div>
+      <button class="primary-btn full-width" id="checkout-btn" disabled>Checkout</button>
+    </div>
+  </aside>
+
+  <div class="modal-overlay hidden" id="checkout-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Checkout</h2>
+        <button class="close-btn" id="close-checkout-btn">×</button>
+      </div>
+      <form id="payment-form">
+        <div class="payment-progress" aria-hidden="true">
+          <div class="step active" aria-hidden="true"></div>
+          <div class="step" aria-hidden="true"></div>
+          <div class="step" aria-hidden="true"></div>
+        </div>
+        <div class="form-row">
+          <label for="name">Full name</label>
+          <input type="text" id="name" name="name" placeholder="Jane Doe" required />
+          <small class="field-hint">Please enter your full name as shown on your ID or account.</small>
+        </div>
+        <div class="form-row">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com" required />
+          <small class="field-hint">We will send a confirmation message to this email to verify it is really you.</small>
+        </div>
+        <div class="form-row" id="verification-row">
+          <label for="verification-code">Verification code</label>
+          <input type="text" id="verification-code" name="verification-code" placeholder="Enter 6-digit code" maxlength="6" />
+          <small class="field-hint">Enter the code sent to your email before your order can be confirmed.</small>
+          <p class="map-status" id="otp-status">A 6-digit verification code will be sent to your email.</p>
+        </div>
+        <div class="form-row">
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" name="phone" placeholder="09171234567" inputmode="numeric" pattern="[0-9]{11,}" required />
+        </div>
+        <div class="form-row delivery-section">
+          <label for="address">Delivery address</label>
+          <input type="text" id="address" name="address" placeholder="House number, street, barangay, city" required />
+          <small class="field-hint">Add a landmark or exact location so the rider can find you easily on Google Maps.</small>
+          <div class="map-actions">
+            <button type="button" class="map-picker-btn" id="map-picker-btn">📍 Use current location</button>
+          </div>
+          <div class="map-hint">
+            <span>📍</span>
+            <span>Use a clear address, building name, or nearby landmark for faster delivery.</span>
+          </div>
+          <div class="form-row">
+            <label for="landmark">Landmark</label>
+            <input type="text" id="landmark" name="landmark" placeholder="e.g. Near the church, beside the plaza" />
+          </div>
+          <p class="map-status" id="map-status">Tap “Use current location” to fill your address automatically.</p>
+        </div>
+
+        <div class="payment-section">
+          <div class="payment-section-header">
+            <h3>Payment method</h3>
+            <p>Choose how you would like to pay</p>
+          </div>
+
+          <div class="payment-methods" role="list">
+            <button type="button" class="payment-option active" data-method="cash" role="listitem" aria-pressed="true">
+              <span class="payment-icon">💵</span>
+              <span>
+                <strong>Cash on delivery</strong>
+                <small>Pay when the rider arrives</small>
+              </span>
+            </button>
+            <button type="button" class="payment-option" data-method="wallet" role="listitem" aria-pressed="false">
+              <span class="payment-icon">📱</span>
+              <span>
+                <strong>e-Wallet</strong>
+                <small>GCash, PayMaya, and similar apps</small>
+              </span>
+            </button>
+          </div>
+
+          <div class="payment-detail active" id="payment-cash">
+            <div class="cash-card">
+              <div class="cash-card-icon">💵</div>
+              <div>
+                <h4>Cash on Delivery</h4>
+                <p>Pay when your order arrives. Keep exact change ready for the rider.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="payment-detail" id="payment-wallet">
+            <div class="form-row">
+              <label for="wallet">Wallet app</label>
+              <input type="text" id="wallet" name="wallet" placeholder="GCash" />
+            </div>
+            <div class="form-row">
+              <label for="wallet-phone">Phone number</label>
+              <input type="tel" id="wallet-phone" name="wallet-phone" placeholder="09171234567" inputmode="numeric" pattern="[0-9]{11,}" />
+            </div>
+          </div>
+        </div>
+
+        <p class="map-status hidden" id="payment-feedback"></p>
+        <button class="primary-btn full-width" type="submit">Place order</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="qr-modal">
+    <div class="modal-card qr-card">
+      <div class="modal-header">
+        <h2>Scan to Pay</h2>
+        <button class="close-btn" id="close-qr-btn">×</button>
+      </div>
+      <div class="qr-body">
+        <p class="qr-instruction" id="qr-instruction">Open your banking or wallet app and scan the QR code below to pay.</p>
+        <img src="" alt="QR code" id="qr-image" class="qr-image" />
+        <p class="qr-amount" id="qr-amount"></p>
+        <div class="form-row">
+          <label for="receipt-upload">Upload payment receipt photo</label>
+          <input type="file" id="receipt-upload" name="receipt-upload" accept="image/*" />
+          <small class="field-hint">After scanning, upload a photo of your receipt so staff can verify the payment.</small>
+        </div>
+        <div class="receipt-preview hidden" id="receipt-preview-wrapper">
+          <img src="" alt="Receipt preview" id="receipt-preview" class="receipt-preview-image" />
+        </div>
+        <p class="map-status hidden" id="qr-feedback"></p>
+        <div class="qr-actions">
+          <button class="primary-btn" id="confirm-payment-btn">I've paid</button>
+          <button class="primary-btn secondary" id="cancel-payment-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+        <div class="modal-overlay hidden" id="success-modal">
+    <div class="modal-card success-card">
+      <h2 id="success-title">Order placed!</h2>
+      <p id="success-message">Your order is confirmed and on its way. Thank you for visiting Bean Rooted Cafe.</p>
+      <p>Order ID: <strong id="success-order-id">—</strong></p>
+      <p>Tracking number: <strong id="success-tracking">—</strong></p>
+      <p>Estimated delivery: <strong id="success-eta">—</strong></p>
+      <div id="success-actions">
+        <button class="primary-btn full-width" id="continue-btn">Continue browsing</button>
+        <button class="primary-btn secondary track-order-btn" id="track-order-btn">Track order</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
